@@ -12,7 +12,7 @@ class App:
         pygame.init()
         self.session = Session()
         self.renderer = Renderer()
-        self.input = InputHandler(self.session, self.renderer.layout)
+        self.input = InputHandler(self.session, self.renderer.layout, self.renderer.raw_panel)
         self.clock = pygame.time.Clock()
 
     def run(self):

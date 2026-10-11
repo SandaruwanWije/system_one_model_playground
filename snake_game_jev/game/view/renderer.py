@@ -7,7 +7,7 @@ from game.core.config import AMBER, BLUE, INK, PANEL, WINDOW
 from game.view import primitives as draw
 from game.view.layout import Layout
 from game.view.sprites import apple, routes, snake
-from game.view.widgets import Disc, Grid, Pads, PauseOverlay, TopBar
+from game.view.widgets import Disc, Grid, Pads, PauseOverlay, RawPanel, TopBar
 
 
 class Renderer:
@@ -19,6 +19,8 @@ class Renderer:
             "font": pygame.font.SysFont("segoeui", 15),
             "big": pygame.font.SysFont("segoeui", 20, bold=True),
             "tiny": pygame.font.SysFont("segoeui", 13),
+            "label": pygame.font.SysFont("segoeui", 13, bold=True),
+            "mono": pygame.font.SysFont("consolas", 13),
         }
         self.layout = Layout(self.width, self.height)
         self.top_bar = TopBar()
@@ -26,6 +28,7 @@ class Renderer:
         self.pads = Pads()
         self.disc = Disc()
         self.overlay = PauseOverlay()
+        self.raw_panel = RawPanel()
         self.pulse = 0.0
 
     def draw(self, session):
@@ -47,30 +50,43 @@ class Renderer:
             self.layout.cell_center,
             self.pulse,
         )
-        routes.paint(
-            self.screen,
-            self.layout.frame,
-            self.layout.jev,
-            self.layout.jev_radius,
-            self.layout.pads,
-            session.pick,
-            session.heat,
-        )
+        if not session.raw_open:
+            routes.paint(
+                self.screen,
+                self.layout.frame,
+                self.layout.jev,
+                self.layout.jev_radius,
+                self.layout.pads,
+                session.pick,
+                session.heat,
+            )
         self.disc.paint(
             self.screen,
             self.fonts,
-            self.layout.jev,
-            self.layout.jev_radius,
+            self.layout,
             session.mode,
             session.busy,
             session.jev.latency_ms,
             session.mode_fade,
             self.pulse,
+            session.raw_open,
         )
         self.pads.paint(self.screen, self.fonts, self.layout, session)
         if session.clock.paused:
             self.overlay.paint(self.screen, self.fonts, self.width, self.height)
+        if session.raw_open:
+            self.raw_panel.paint(self.screen, self.fonts, self.layout, session)
+        self._cursor(session)
         pygame.display.flip()
+
+    def _cursor(self, session):
+        pos = pygame.mouse.get_pos()
+        hot = self.layout.expand_btn.collidepoint(pos) or self.layout.pause_btn.collidepoint(pos)
+        hot = hot or any(box.collidepoint(pos) for box in self.layout.mode_btns.values())
+        if session.raw_open and self.raw_panel.close_btn.collidepoint(pos):
+            hot = True
+        kind = pygame.SYSTEM_CURSOR_HAND if hot else pygame.SYSTEM_CURSOR_ARROW
+        pygame.mouse.set_cursor(kind)
 
     def _backdrop(self):
         self.screen.fill(INK)

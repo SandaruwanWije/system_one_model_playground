@@ -18,6 +18,7 @@ class Layout:
         self.pads = {}
         self.mode_btns = {}
         self.pause_btn = pygame.Rect(0, 0, 0, 0)
+        self.expand_btn = pygame.Rect(0, 0, 0, 0)
 
     def place_board(self, board_top, cols, rows):
         ox = self.shell.x + (self.shell.w - cols * self.cell) / 2

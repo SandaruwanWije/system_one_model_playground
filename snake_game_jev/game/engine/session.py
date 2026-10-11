@@ -25,6 +25,7 @@ class Session:
         self.ready = False
         self.mode_fade = 1.0
         self.heat = {name: 0.0 for name in WAYS}
+        self.raw_open = False
 
     def start(self):
         self.clock.begin()
@@ -34,6 +35,7 @@ class Session:
         if mode == self.mode:
             return
         self.mode = mode
+        self.raw_open = False
         self.clock.paused = False
         self.mode_fade = 0.0
         self._reset_run()
@@ -47,6 +49,9 @@ class Session:
 
     def toggle_pause(self):
         self.clock.toggle_pause()
+
+    def toggle_raw(self):
+        self.raw_open = not self.raw_open
 
     def update(self, dt, lerp):
         self._update_heat(dt, lerp)
