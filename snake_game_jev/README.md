@@ -96,3 +96,6 @@ Use Pause if you want to stop and look at the board.
 ## Credit
 
 This project is part of the System One Model Playground. Jev and the TypeSafe API belong to TypeSafe AI.
+
+The eat sound comes from Pixabay:
+https://pixabay.com/sound-effects/people-eating-sound-effect-36186/
